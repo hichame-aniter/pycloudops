@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EC2 Instances</title>
+</head>
+<body>
+    <h1>EC2 Instances</h1>
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Instance ID</th>
+            <th>Status</th>
+            <th>Type</th>
+            <th>Region</th>            
+            <th>Actions</th>
+        </tr>
+        {% for instance in instances %}
+        <tr>
+            <td>{{ instance.name }}</td>
+            <td>{{ instance.id }}</td>
+            <td>{{ instance.state }}</td>
+            <td>{{ instance.type }}</td>
+            <td>{{ instance.region }}</td>            
+            <td>
+                {% if instance.state == "running" %}
+                    <form action="{% url 'ec2_action' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="instance_id" value="{{ instance.id }}">
+                        <input type="hidden" name="action" value="stop">
+                        <button type="submit">Stop</button>
+                    </form>
+                {% endif %}
+                {% if instance.state == "stopped" %}
+                    <form action="{% url 'ec2_action' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="instance_id" value="{{ instance.id }}">
+                        <input type="hidden" name="action" value="start">
+                        <button type="submit">Start</button>
+                    </form>
+                {% endif %}
+                
+                
+            </td>
+        </tr>
+        {% endfor %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </table>
+</body>
+</html>
